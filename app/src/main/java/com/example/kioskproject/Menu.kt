@@ -16,7 +16,7 @@ open class Product (
     val price: Double)
     : Menu(number, name, description) {
     open fun showDetail() {
-        println("$number. $name | $price | $description")
+        println("$number. $name | W $price | $description")
     }
 }
 
@@ -29,12 +29,8 @@ class Coffee (
 )
     : Product(number, name, description, price) {
 
-
     override fun showDetail() {
-        println("$number. $name | $price | $description | ${if(isIce) "ICE" else "HOT"}")
-    }
-    override fun showMenu() {
-
+        println("$number. $name | W $price | $description | ${if(isIce) "ICE" else "HOT"}")
     }
 }
 
@@ -46,7 +42,7 @@ class Juice (
     private val fruit: String)
     : Product(number, name, description, price) {
     override fun showDetail() {
-        println("$number. $name | $price | $description | 사용 과일: $fruit")
+        println("$number. $name | W $price | $description | 사용 과일: $fruit")
     }
 }
 
@@ -57,9 +53,13 @@ class Smoothie (
     price: Double,
     private val withFruit: Boolean)
     : Product(number, name, description, price) {
-    override fun showDetail() {
-        println("$number. $name | $price | $description | 과일 함유: ${if(withFruit) "O" else "X"}")
+
+    // 부모 클래스(Product)의 showDetail 사용 실습을 위한 주석 처리 :)
+   /*
+   override fun showDetail() {
+        println("$number. $name | W $price | $description | 과일 함유: ${if(withFruit) "O" else "X"}")
     }
+    */
 }
 
 class Dessert (
@@ -70,6 +70,6 @@ class Dessert (
     private val dessertKind: String)
     : Product(number, name, description, price) {
     override fun showDetail() {
-        println("$number. $name | $price | $description | 디저트 종류: $dessertKind")
+        println("$number. $name | W $price | $description | 디저트 종류: $dessertKind")
     }
 }
