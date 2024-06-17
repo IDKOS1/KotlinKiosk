@@ -21,7 +21,7 @@ fun main() {
         // 메뉴 대분류 출력
         displayMenu(menu)
         // 메뉴 종류 선택(숫자 선택하기)
-        val selectMenu = readln().toInt()   //Lv4 예외 처리 필요
+        val selectMenu = isInt()
 
         //선택한 메뉴에 따라 상세 메뉴 출력
         when (selectMenu) {
@@ -74,6 +74,7 @@ fun main() {
 }
 
 fun displayMenu(menu: MutableList<Menu>) {
+    println("-------- 카페 메뉴 주문하기 --------")
     println("아래 메뉴판을 보시고 메뉴를 골라 입력해 주세요.")
     for(m in menu){
         m.showMenu()
@@ -83,20 +84,20 @@ fun displayMenu(menu: MutableList<Menu>) {
 }
 
 fun displaySubMenu(subMenu: MutableList<Product>): Pair<Product, Int>? {
-    for(sub in subMenu) sub.showDetail()
+    var subMenuNumber:Int = 0
     val numberMenu = subMenu.size
-    println("0. 뒤로가기")
-
-    val subMenuNumber = readLine()!!.toInt()            //Lv4 예외 처리 필요
 
     while(true) {
+        for(sub in subMenu) sub.showDetail()
+        println("0. 뒤로가기")
+
+        subMenuNumber = isInt()
         when (subMenuNumber) {
             in 1..numberMenu -> {
                 print("선택한 메뉴 : ")
                 subMenu[subMenuNumber - 1].showMenu()
                 println("수량을 선택해 주세요.")
-                // 상세 메뉴 선택
-                val number = readLine()!!.toInt()       //Lv4 예외 처리 필요
+                val number = isInt()
                 while(true) {
                     println("장바구니에 추가 하시겠습니까?")
                     println("[Y / N]")
@@ -117,7 +118,6 @@ fun displaySubMenu(subMenu: MutableList<Product>): Pair<Product, Int>? {
                     }
                 }
             }
-
             0 -> {
                 println("뒤로가기 선택")
                 println("--------------------------------")
@@ -132,11 +132,10 @@ fun displaySubMenu(subMenu: MutableList<Product>): Pair<Product, Int>? {
 }
 
 fun showCart(cartList: MutableMap<Product, Int>, orderNum: Int): Pair<MutableMap<Product, Int>, Boolean> {
-    var currentCartList = cartList
     while(true) {
         var totalPrice = 0.0
         println("[장바구니 목록]")
-        for (cart in currentCartList) {
+        for (cart in cartList) {
             println("${cart.key.name} | 수량: ${cart.value} | 가격: W ${cart.key.price * cart.value}")
             totalPrice += cart.key.price * cart.value
         }
@@ -144,52 +143,52 @@ fun showCart(cartList: MutableMap<Product, Int>, orderNum: Int): Pair<MutableMap
         println("1. 결제 하기")
         println("2. 메뉴 수정 및 삭제")
         println("0. 뒤로가기")
-        val chooseCart = readln().toInt()
+        val chooseCart = isInt()
         when (chooseCart) {
             1 -> {
                 println("총 금액은 W $totalPrice 입니다.")
                 println("결제할 금액을 선택해 주세요.")
-                val payMoney = readln().toInt()
+                val payMoney = isDouble()
                 if (payMoney >= totalPrice) {
                     println("결제가 완료 되었습니다.")
                     println("거스름 돈은 W ${payMoney - totalPrice} 입니다.")
                     println("주문 번호는 $orderNum 번 입니다. 잠시만 기다려 주세요")
                     return Pair(mutableMapOf(), true)
                 } else {
-                    println("현재 잔액은 $payMoney W으로 ${totalPrice - payMoney}W이 부족해서 주문할 수 없습니다.")
+                    println("현재 잔액은 $payMoney W으로 ${String.format("%.1f",  totalPrice - payMoney)}W이 부족해서 주문할 수 없습니다.")
                 }
             }
             // 장바구니 메뉴 수정 하기
             2 -> {
-                while(true) {
-                    if(currentCartList.isEmpty()) {
+                while (true) {
+                    if (cartList.isEmpty()) {
                         println("장바구니가 비어있습니다. 메뉴를 추가해 주세요.")
                         println()
-                        return Pair(currentCartList, false)
+                        return Pair(cartList, false)
                     }
                     var num = 1
-                    // currentCartList 의 Key 값 이름
-                    val menuList = mutableListOf<String>()
+
+                    // currentCartList 의 Key 값 저장
+                    val menuList = mutableListOf<Product>()
 
                     println("[장바구니 수정 하기]")
                     println("수정할 메뉴를 선택하세요.")
-                    for (cart in currentCartList) {
+                    for (cart in cartList) {
                         println("[$num] ${cart.key.name} | 수량: ${cart.value} ")
-                        menuList += cart.key.name
+                        menuList += cart.key
                         num++
                     }
                     println("[0] 뒤로 가기")
 
-                    val fixSelect = readLine()!!.toInt()            //Lv4 예외 처리 필요
+                    val fixSelect = isInt()
                     when (fixSelect) {
-                        in 1..currentCartList.size -> {
-                            var fixMenuName = menuList[fixSelect - 1]
+                        in 1..cartList.size -> {
                             println("몇개로 수정 하시겠습니까? (0개 입력시 장바구니에서 제외)")
-                            val fixNumber = readln().toInt()
+                            val fixNumber = isInt()
                             if (fixNumber == 0) {
-                                currentCartList.remove(currentCartList.keys.elementAt(fixSelect - 1))
+                                cartList.remove(menuList[fixSelect -1])
                             } else {
-                                currentCartList[currentCartList.keys.elementAt(fixSelect - 1)] = fixNumber
+                                cartList[menuList[fixSelect -1]] = fixNumber
                             }
                             println("수정 완료")
                         }
@@ -199,19 +198,40 @@ fun showCart(cartList: MutableMap<Product, Int>, orderNum: Int): Pair<MutableMap
                     }
                 }
             }
-            0 -> return Pair(currentCartList, false)
+
+            0 -> return Pair(cartList, false)
             else -> println("잘못 입력 하셨습니다.")
         }
         println("--------------------------------")
     }
 }
 
+// 숫자만 입력 가능하게 예외처리
+fun isInt(): Int {
+    while(true) {
+        try {
+            return readLine()!!.toInt()
+        } catch (e: NumberFormatException) {
+            println("숫자만 입력해 주세요.")
+        }
+    }
+}
+// double형 예외처리
+fun isDouble(): Double {
+    while(true) {
+        try {
+            return readLine()!!.toDouble()
+        } catch (e: NumberFormatException) {
+            println("숫자만 입력해 주세요.")
+        }
+    }
+}
 fun initCafeMenu() : MutableList<Menu> {
     return mutableListOf(
         Menu(1, "COFFEE", "에스프레소 샷이 들어간 커피"),
         Menu(2, "JUICE/ADE", "시원한 주스와 에이드"),
         Menu(3, "SMOOTHIE", "얼음을 갈아 만든 스무디"),
-        Menu(4, "DESSERT", "음료와 함께 즐길 수 있는 디저트"),
+        Menu(4, "DESSERT", "음료와 함께 즐기는 디저트"),
     )
 }
 
