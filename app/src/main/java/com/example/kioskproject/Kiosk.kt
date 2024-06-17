@@ -1,10 +1,10 @@
 
-import com.example.kioskproject.Coffee
-import com.example.kioskproject.Dessert
-import com.example.kioskproject.Juice
-import com.example.kioskproject.Menu
-import com.example.kioskproject.Product
-import com.example.kioskproject.Smoothie
+import com.example.kioskproject.Class.Coffee
+import com.example.kioskproject.Class.Dessert
+import com.example.kioskproject.Class.Juice
+import com.example.kioskproject.Class.Menu
+import com.example.kioskproject.Class.Product
+import com.example.kioskproject.Class.Smoothie
 import kotlin.collections.mutableListOf
 
 fun main() {
